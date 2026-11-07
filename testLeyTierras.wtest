@@ -1,0 +1,70 @@
+import leyTierras.*
+
+describe "Registro Nacional de Tierras Rurales - tests mínimos" {
+
+  test "Una persona argentina puede comprar un terreno junto a una laguna" {
+    const laguna = new Tierra(nombre = "Campo Laguna de Lobos", superficie = 120, precio = 500, region = zonaNucleo, tieneAgua = true)
+    const personaArgentina = new Comprador(presupuesto = 1000)
+
+    assert.that(personaArgentina.puedeComprar(laguna))
+    personaArgentina.comprarTierra(laguna)
+    assert.equals(500, personaArgentina.presupuesto())
+    assert.equals(120, personaArgentina.superficieTotal())
+  }
+
+  test "Una persona extranjera no puede comprar un terreno de frontera" {
+    const frontera = new Tierra(nombre = "Campo del paso fronterizo", superficie = 100, precio = 200, region = zonaPatagonia, esFronterizo = true)
+    const personaExtranjera = new Extranjero(presupuesto = 1000)
+
+    assert.notThat(personaExtranjera.puedeComprar(frontera))
+    assert.throwsExceptionWithMessage("Compra no permitida", { personaExtranjera.comprarTierra(frontera) })
+    assert.equals(1000, personaExtranjera.presupuesto())
+    assert.equals(0, personaExtranjera.cantCertificado())
+  }
+
+  test "Extranjero con 600 hectareas nucleo no puede comprar 500 nucleo pero si 3000 Patagonia" {
+    const campoInicial = new Tierra(nombre = "Campo inicial", superficie = 600, precio = 100, region = zonaNucleo)
+    const campoNucleo = new Tierra(nombre = "Campo nucleo adicional", superficie = 500, precio = 200, region = zonaNucleo)
+    const campoPatagonia = new Tierra(nombre = "Campo patagonico", superficie = 3000, precio = 200, region = zonaPatagonia)
+    const personaExtranjera = new Extranjero(presupuesto = 1000)
+
+    personaExtranjera.comprarTierra(campoInicial)
+    assert.equals(600, personaExtranjera.cantidadHectareasEquivalentes())
+    assert.notThat(personaExtranjera.puedeComprar(campoNucleo))
+    assert.that(personaExtranjera.puedeComprar(campoPatagonia))
+  }
+
+  test "Empresa con capital extranjero inicial de 40 por ciento cambia su limite tras una inversion" {
+    const campoInicial = new Tierra(nombre = "Campo inicial", superficie = 600, precio = 100, region = zonaNucleo)
+    const campoAdicional = new Tierra(nombre = "Campo adicional", superficie = 500, precio = 100, region = zonaNucleo)
+    const empresa = new Empresa(presupuesto = 1000, porcentajeCapitalExtranjero = 40)
+
+    empresa.comprarTierra(campoInicial)
+    assert.that(empresa.puedeComprar(campoAdicional))
+    empresa.recibirInversionExtranjera(20)
+    assert.that(empresa.esExtranjera())
+    assert.equals(800, empresa.limiteHectareasEquivalente())
+    assert.notThat(empresa.puedeComprar(campoAdicional))
+  }
+
+  test "Una persona argentina no puede comprar si el precio supera el presupuesto" {
+    const campoCaro = new Tierra(nombre = "Campo caro", superficie = 100, precio = 1200, region = zonaNucleo)
+    const personaArgentina = new Comprador(presupuesto = 1000)
+
+    assert.throwsExceptionWithMessage("Compra no permitida", { personaArgentina.comprarTierra(campoCaro) })
+    assert.equals(1000, personaArgentina.presupuesto())
+    assert.equals(0, personaArgentina.superficieTotal())
+  }
+
+  test "Una persona extranjera tramita dos certificados al realizar dos compras permitidas" {
+    const campoUno = new Tierra(nombre = "Campo 1", superficie = 200, precio = 100, region = zonaNucleo)
+    const campoDos = new Tierra(nombre = "Campo 2", superficie = 3000, precio = 200, region = zonaPatagonia)
+    const personaExtranjera = new Extranjero(presupuesto = 1000)
+
+    personaExtranjera.comprarTierra(campoUno)
+    personaExtranjera.comprarTierra(campoDos)
+    assert.equals(2, personaExtranjera.cantCertificado())
+    assert.equals(500, personaExtranjera.cantidadHectareasEquivalentes())
+    assert.equals(700, personaExtranjera.presupuesto())
+  }
+}
