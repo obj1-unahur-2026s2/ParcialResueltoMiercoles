@@ -12,7 +12,7 @@ class Tierra{
   method hectareasEquivalentes() = region.hectareasEquivalentes(superficie)
 }
 
-// es importante que existan estos objetos y que no se use un Else IF en Tierra. Porque asi evaluamos la programacion orientada a objetos
+// es importante que existan estos objetos y que no se use un Else IF en Tierra. Si usaron clases, deben estar bien instanciadas
 object zonaNucleo{
   method hectareasEquivalentes(superficie) = superficie
 }
