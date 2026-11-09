@@ -35,7 +35,7 @@ class Comprador{
             tierras.add(unaTierra)
       }
       else {
-            throw new Exception(message = "Compra no permitida") // no es tan importante si hacen la excepcion porque no lo vimos mucho. Mientras tengan bien resuelto lo interno del if esta ok. solo pongamos el comentario de que falta esto 
+            throw new Exception(message = "Compra no permitida") // no es tan importante si hacen la excepcion porque no lo vimos mucho. Mientras tengan bien resuelto lo interno del if esta ok.
       }
   }
 
@@ -52,7 +52,7 @@ class Comprador{
   method comprarLista(listaTierras) =  listaTierras.forEach({t => if(self.puedeComprar(t))
                                                                       self.comprarTierra(t)
                                                                     })
-  //No es la mejor opcion pero tambien se las tomamos como validas. Poner comentarios explicando que no es la correcta, pero no bajamos puntos si hacen esta opcion:
+  //otra opcion que se puede tomar como valida:
   //method comprarLista(listaTierras) =  self.tierrasPuedeComprar(listaTierras).forEach({t => self.comprarTierra(t)})
 }
 
